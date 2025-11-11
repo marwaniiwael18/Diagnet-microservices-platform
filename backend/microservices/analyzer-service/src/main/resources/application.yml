@@ -1,0 +1,74 @@
+# Spring Boot Application Configuration
+# Analyzer Service - Anomaly Detection
+
+spring:
+  application:
+    name: analyzer-service
+    
+  # Database Configuration (shared with collector-service)
+  datasource:
+    url: jdbc:postgresql://localhost:5432/diagnostic
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# Server Configuration
+server:
+  port: 8082
+  
+# External Service URLs
+services:
+  collector:
+    url: http://localhost:8081
+    
+# Analysis Configuration
+analysis:
+  # Z-score threshold for anomaly detection
+  # Values > 3.0 are considered anomalies (3 standard deviations)
+  z-score-threshold: 3.0
+  
+  # Minimum data points needed for analysis
+  min-data-points: 10
+  
+  # Temperature thresholds (Celsius)
+  temperature:
+    warning: 90.0
+    critical: 100.0
+    
+  # Vibration thresholds (0.0 - 1.0)
+  vibration:
+    warning: 0.7
+    critical: 0.8
+    
+  # Time window for analysis (hours)
+  analysis-window: 24
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+      
+# Logging
+logging:
+  level:
+    com.diagnet.analyzer: DEBUG
+    org.springframework.web: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

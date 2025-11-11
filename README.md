@@ -1,6 +1,6 @@
 # 🏭 DiagNet - Industrial Diagnostic Platform
 
-[![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/)
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
@@ -69,7 +69,7 @@ DiagNet simulates an **industrial diagnostic box** that connects to machines (se
 
 | Category | Technologies |
 |----------|-------------|
-| **Backend** | Java 17, Spring Boot 3.x, Spring Security, Spring Data JPA |
+| **Backend** | Java 21 (LTS), Spring Boot 3.x, Spring Security, Spring Data JPA |
 | **Frontend** | React 18, Vite, Tailwind CSS, Recharts |
 | **Database** | PostgreSQL, TimescaleDB (time-series extension) |
 | **Messaging** | Eclipse Mosquitto (MQTT Broker), Eclipse Paho (MQTT Client) |
@@ -97,7 +97,7 @@ DiagNet simulates an **industrial diagnostic box** that connects to machines (se
 
 ```bash
 # Check if you have these installed:
-java -version        # Should show 17.x
+java -version        # Should show 21.x (LTS)
 mvn -version         # Should show 3.8+
 node -version        # Should show 20.x
 docker --version     # Should show 20.x+
