@@ -7,9 +7,9 @@ spring:
     
   # Database Configuration (PostgreSQL/TimescaleDB)
   datasource:
-    url: jdbc:postgresql://localhost:5432/diagnostic
-    username: admin
-    password: admin
+    url: jdbc:postgresql://localhost:5432/diagnet_db
+    username: diagnet_user
+    password: diagnet_password
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -19,12 +19,14 @@ spring:
   # JPA/Hibernate Configuration
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: validate  # Use validate since TimescaleDB schema is managed by migrations
+    show-sql: false  # Set to false for production
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+        jdbc:
+          time_zone: UTC
 
 # Server Configuration
 server:

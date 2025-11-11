@@ -88,14 +88,37 @@ public class MachineData {
     private Double vibration;
 
     /**
-     * Pressure in kPa (optional)
-     * Some machines report pressure, others don't
+     * Pressure in bar (optional)
      */
     @Column(nullable = true)
     private Double pressure;
 
     /**
-     * Machine status: "running", "idle", "error", "maintenance"
+     * Humidity percentage (0-100)
+     */
+    @Column(nullable = true)
+    private Double humidity;
+
+    /**
+     * Power consumption in watts
+     */
+    @Column(name = "power_consumption", nullable = true)
+    private Double powerConsumption;
+
+    /**
+     * Rotation speed in RPM
+     */
+    @Column(name = "rotation_speed", nullable = true)
+    private Double rotationSpeed;
+
+    /**
+     * Physical location of the machine
+     */
+    @Column(nullable = true, length = 100)
+    private String location;
+
+    /**
+     * Machine status: "RUNNING", "IDLE", "WARNING", "CRITICAL"
      */
     @Column(nullable = false, length = 20)
     private String status;

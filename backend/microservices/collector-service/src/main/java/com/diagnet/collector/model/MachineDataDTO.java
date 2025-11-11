@@ -43,12 +43,9 @@ public class MachineDataDTO {
      * Machine ID validation:
      * - Cannot be null or empty
      * - Length between 1 and 50 characters
-     * - Pattern: Must start with letter, followed by letters/numbers
      */
     @NotBlank(message = "Machine ID is required")
     @Size(min = 1, max = 50, message = "Machine ID must be between 1 and 50 characters")
-    @Pattern(regexp = "^[A-Z][A-Z0-9]*$", 
-             message = "Machine ID must start with a letter and contain only uppercase letters and numbers")
     private String machineId;
 
     /**
@@ -85,22 +82,56 @@ public class MachineDataDTO {
     private Double vibration;
 
     /**
-     * Pressure (optional):
+     * Pressure (optional bar):
      * - Can be null (not all machines report pressure)
-     * - If provided: 0 to 500 kPa
+     * - If provided: 0 to 10 bar
      */
     @DecimalMin(value = "0.0", message = "Pressure must be positive")
-    @DecimalMax(value = "500.0", message = "Pressure must not exceed 500 kPa")
+    @DecimalMax(value = "10.0", message = "Pressure must not exceed 10 bar")
     private Double pressure;
+
+    /**
+     * Humidity (optional %):
+     * - Can be null
+     * - If provided: 0 to 100%
+     */
+    @DecimalMin(value = "0.0", message = "Humidity must be positive")
+    @DecimalMax(value = "100.0", message = "Humidity must not exceed 100%")
+    private Double humidity;
+
+    /**
+     * Power consumption (watts):
+     * - Can be null
+     * - If provided: 0 to 10000 watts
+     */
+    @DecimalMin(value = "0.0", message = "Power consumption must be positive")
+    @DecimalMax(value = "10000.0", message = "Power consumption must not exceed 10000 watts")
+    private Double powerConsumption;
+
+    /**
+     * Rotation speed (RPM):
+     * - Can be null
+     * - If provided: 0 to 5000 RPM
+     */
+    @DecimalMin(value = "0.0", message = "Rotation speed must be positive")
+    @DecimalMax(value = "5000.0", message = "Rotation speed must not exceed 5000 RPM")
+    private Double rotationSpeed;
+
+    /**
+     * Machine location (optional):
+     * - Can be null
+     */
+    @Size(max = 100, message = "Location must not exceed 100 characters")
+    private String location;
 
     /**
      * Status validation:
      * - Cannot be null or empty
-     * - Must be one of: running, idle, error, maintenance
+     * - Must be one of: RUNNING, IDLE, WARNING, CRITICAL
      */
     @NotBlank(message = "Status is required")
-    @Pattern(regexp = "^(running|idle|error|maintenance)$", 
-             message = "Status must be one of: running, idle, error, maintenance")
+    @Pattern(regexp = "^(RUNNING|IDLE|WARNING|CRITICAL)$", 
+             message = "Status must be one of: RUNNING, IDLE, WARNING, CRITICAL")
     private String status;
 
     /**
@@ -118,6 +149,10 @@ public class MachineDataDTO {
         entity.setTemperature(this.temperature);
         entity.setVibration(this.vibration);
         entity.setPressure(this.pressure);
+        entity.setHumidity(this.humidity);
+        entity.setPowerConsumption(this.powerConsumption);
+        entity.setRotationSpeed(this.rotationSpeed);
+        entity.setLocation(this.location);
         entity.setStatus(this.status);
         return entity;
     }
