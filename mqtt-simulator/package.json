@@ -1,0 +1,24 @@
+{
+  "name": "diagnet-mqtt-simulator",
+  "version": "1.0.0",
+  "description": "MQTT simulator for DiagNet - Simulates industrial machine sensor data",
+  "main": "simulator.js",
+  "scripts": {
+    "start": "node simulator.js",
+    "start:single": "node simulator.js --machines=1",
+    "start:multi": "node simulator.js --machines=5",
+    "test": "node simulator.js --machines=1 --interval=5000"
+  },
+  "keywords": [
+    "mqtt",
+    "simulator",
+    "iot",
+    "industrial",
+    "sensors"
+  ],
+  "author": "DiagNet Team",
+  "license": "MIT",
+  "dependencies": {
+    "mqtt": "^5.3.0"
+  }
+}
