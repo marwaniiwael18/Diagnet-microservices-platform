@@ -1,0 +1,65 @@
+# Spring Boot Application Configuration
+# This file configures all aspects of the collector-service
+
+spring:
+  application:
+    name: collector-service
+    
+  # Database Configuration (PostgreSQL/TimescaleDB)
+  datasource:
+    url: jdbc:postgresql://localhost:5432/diagnostic
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      
+  # JPA/Hibernate Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+# Server Configuration
+server:
+  port: 8081
+        
+# MQTT Configuration
+mqtt:
+  broker-url: tcp://localhost:1883
+  client-id: collector-service-${random.uuid}
+  username: admin
+  password: admin
+  topics:
+    - machine/+/data
+    - machine/+/status
+  connection-timeout: 30
+  keep-alive-interval: 60
+  clean-session: true
+  automatic-reconnect: true
+  
+# Actuator (Health Checks & Metrics)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+      
+# Logging
+logging:
+  level:
+    com.diagnet.collector: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    org.eclipse.paho: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
