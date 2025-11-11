@@ -47,7 +47,9 @@ server:
 
 # JWT Configuration
 jwt:
-  secret: ${JWT_SECRET:DiagNetSuperSecretKeyForJWTTokenGeneration2025MustBeLongEnough}
+  # Secret key MUST be at least 512 bits (64 bytes) for HS512 algorithm
+  # This is a base64-encoded 512-bit secret key
+  secret: ${JWT_SECRET:DiagNetSuperSecretKeyForJWTTokenGeneration2025MustBeLongEnough!!!ThisIsA512BitSecretKeyForHS512Algorithm@@@@####}
   expiration: 86400000  # 24 hours in milliseconds
 
 # Actuator
