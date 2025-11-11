@@ -1,0 +1,92 @@
+# Java
+*.class
+*.jar
+*.war
+*.ear
+target/
+*.iml
+.idea/
+.classpath
+.project
+.settings/
+*.log
+
+# Maven
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+package-lock.json
+yarn.lock
+
+# React
+/build
+.DS_Store
+.eslintcache
+
+# Docker
+*.log
+docker-compose.override.yml
+
+# Secrets & Config
+.env
+*.env
+application-prod.yml
+application-secrets.yml
+secrets/
+*.key
+*.pem
+*.p12
+*.jks
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Testing
+coverage/
+.nyc_output/
+*.test.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*~.nib
