@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: diagnet-timescaledb
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: diagnet_db
+      POSTGRES_USER: diagnet_user
+      POSTGRES_PASSWORD: diagnet_password
+      # TimescaleDB-specific settings
+      TIMESCALEDB_TELEMETRY: 'off'
+    volumes:
+      # Persist database data
+      - timescaledb-data:/var/lib/postgresql/data
+      # Mount migration scripts
+      - ./migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U diagnet_user -d diagnet_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - diagnet-network
+
+  # pgAdmin for database management (optional, for development)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: diagnet-pgadmin
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@diagnet.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - timescaledb
+    networks:
+      - diagnet-network
+
+volumes:
+  timescaledb-data:
+    driver: local
+  pgadmin-data:
+    driver: local
+
+networks:
+  diagnet-network:
+    driver: bridge

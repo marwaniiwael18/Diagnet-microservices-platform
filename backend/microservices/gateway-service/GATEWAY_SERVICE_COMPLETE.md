@@ -1,4 +1,4 @@
-# Gateway Service - Completion Documentation
+8# Gateway Service - Completion Documentation
 
 ## Overview
 API Gateway with JWT authentication for the DiagNet microservices platform. Built with **Spring Cloud Gateway** (WebFlux reactive stack) and **Java 21**.
