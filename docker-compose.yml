@@ -1,0 +1,213 @@
+version: '3.8'
+
+services:
+  # ============================================
+  # DATABASE - TimescaleDB (PostgreSQL)
+  # ============================================
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: diagnet-timescaledb
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: diagnet_db
+      POSTGRES_USER: diagnet_user
+      POSTGRES_PASSWORD: diagnet_password
+      TIMESCALEDB_TELEMETRY: 'off'
+    volumes:
+      - timescaledb-data:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U diagnet_user -d diagnet_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - diagnet-network
+
+  # ============================================
+  # MQTT BROKER - Mosquitto
+  # ============================================
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: diagnet-mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./observability/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-logs:/mosquitto/log
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_sub -t '$$SYS/#' -C 1 -i healthcheck -W 3"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - diagnet-network
+
+  # ============================================
+  # COLLECTOR SERVICE - Data Ingestion
+  # ============================================
+  collector-service:
+    build:
+      context: ./backend/microservices/collector-service
+      dockerfile: Dockerfile
+    container_name: diagnet-collector
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://timescaledb:5432/diagnet_db
+      SPRING_DATASOURCE_USERNAME: diagnet_user
+      SPRING_DATASOURCE_PASSWORD: diagnet_password
+      MQTT_BROKER_URL: tcp://mosquitto:1883
+      JAVA_OPTS: "-Xmx512m -Xms256m"
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      mosquitto:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8081/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - diagnet-network
+
+  # ============================================
+  # ANALYZER SERVICE - Anomaly Detection
+  # ============================================
+  analyzer-service:
+    build:
+      context: ./backend/microservices/analyzer-service
+      dockerfile: Dockerfile
+    container_name: diagnet-analyzer
+    restart: unless-stopped
+    ports:
+      - "8082:8082"
+    environment:
+      COLLECTOR_SERVICE_URL: http://collector-service:8081
+      JAVA_OPTS: "-Xmx512m -Xms256m"
+    depends_on:
+      collector-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8082/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - diagnet-network
+
+  # ============================================
+  # GATEWAY SERVICE - API Gateway with JWT
+  # ============================================
+  gateway-service:
+    build:
+      context: ./backend/microservices/gateway-service
+      dockerfile: Dockerfile
+    container_name: diagnet-gateway
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      COLLECTOR_SERVICE_URL: http://collector-service:8081
+      ANALYZER_SERVICE_URL: http://analyzer-service:8082
+      JWT_SECRET: your-256-bit-secret-key-for-jwt-token-generation-please-change-this-in-production
+      JAVA_OPTS: "-Xmx512m -Xms256m"
+    depends_on:
+      collector-service:
+        condition: service_healthy
+      analyzer-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - diagnet-network
+
+  # ============================================
+  # MQTT SIMULATOR - Generates Test Data
+  # ============================================
+  mqtt-simulator:
+    build:
+      context: ./mqtt-simulator
+      dockerfile: Dockerfile
+    container_name: diagnet-mqtt-simulator
+    restart: unless-stopped
+    environment:
+      MQTT_BROKER: mqtt://mosquitto:1883
+      NUM_MACHINES: 3
+      INTERVAL: 10000
+    depends_on:
+      mosquitto:
+        condition: service_healthy
+    networks:
+      - diagnet-network
+
+  # ============================================
+  # PGADMIN - Database Management UI
+  # ============================================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: diagnet-pgadmin
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@diagnet.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - timescaledb
+    networks:
+      - diagnet-network
+
+  # ============================================
+  # REACT DASHBOARD - Frontend UI
+  # ============================================
+  # react-dashboard:
+  #   build:
+  #     context: ./frontend/react-dashboard
+  #     dockerfile: Dockerfile
+  #   container_name: diagnet-dashboard
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     REACT_APP_API_URL: http://localhost:8080
+  #   depends_on:
+  #     - gateway-service
+  #   networks:
+  #     - diagnet-network
+
+# ============================================
+# VOLUMES - Data Persistence
+# ============================================
+volumes:
+  timescaledb-data:
+    driver: local
+  mosquitto-data:
+    driver: local
+  mosquitto-logs:
+    driver: local
+  pgadmin-data:
+    driver: local
+
+# ============================================
+# NETWORKS
+# ============================================
+networks:
+  diagnet-network:
+    driver: bridge
