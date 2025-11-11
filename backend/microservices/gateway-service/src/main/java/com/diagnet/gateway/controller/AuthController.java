@@ -29,7 +29,6 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/auth")
-@RequiredArgsConstructor
 @Slf4j
 public class AuthController {
 
@@ -37,14 +36,24 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     
     // Hardcoded users for demo (in production, use database)
-    // Password: "admin123" hashed with BCrypt
     private static final Map<String, String> USERS = new HashMap<>();
     
-    static {
-        // admin / admin123
-        USERS.put("admin", "$2a$10$xQ3jKYP2EP8RKmFKpzFKLeXRqLFPJlL3hI4XMRNz.XtZLHOLADLay");
-        // user / user123
-        USERS.put("user", "$2a$10$fFD8MpZLKpFKzMNZvdYXm.R0qQDqF8XwL9pT8w/N7eYgFZ0gkMJ1u");
+    // Constructor to initialize users with properly encoded passwords
+    public AuthController(JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
+        this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
+        
+        // Generate and store password hashes on startup
+        if (USERS.isEmpty()) {
+            String adminHash = passwordEncoder.encode("admin123");
+            String userHash = passwordEncoder.encode("user123");
+            
+            USERS.put("admin", adminHash);
+            USERS.put("user", userHash);
+            
+            log.info("🔑 [INIT] Generated password hash for admin: {}", adminHash);
+            log.info("🔑 [INIT] Generated password hash for user: {}", userHash);
+        }
     }
     
     /**
@@ -67,23 +76,34 @@ public class AuthController {
      */
     @PostMapping("/login")
     public Mono<ResponseEntity<AuthResponse>> login(@RequestBody LoginRequest request) {
-        log.info("Login attempt for user: {}", request.getUsername());
+        log.info("🔐 [AUTH] Login attempt for user: {}", request.getUsername());
+        log.debug("📝 [AUTH] Request details: username={}", request.getUsername());
         
         // Check if user exists
         String storedPassword = USERS.get(request.getUsername());
         if (storedPassword == null) {
-            log.warn("User not found: {}", request.getUsername());
+            log.warn("❌ [AUTH] User not found: {}", request.getUsername());
+            log.warn("📋 [AUTH] Available users: {}", USERS.keySet());
             return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
         }
         
+        log.debug("✓ [AUTH] User exists: {}", request.getUsername());
+        
         // Verify password
-        if (!passwordEncoder.matches(request.getPassword(), storedPassword)) {
-            log.warn("Invalid password for user: {}", request.getUsername());
+        boolean passwordMatches = passwordEncoder.matches(request.getPassword(), storedPassword);
+        log.debug("🔑 [AUTH] Password match result: {}", passwordMatches);
+        
+        if (!passwordMatches) {
+            log.warn("❌ [AUTH] Invalid password for user: {}", request.getUsername());
             return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
         }
+        
+        log.info("✓ [AUTH] Password verified for user: {}", request.getUsername());
         
         // Generate JWT token
         String token = jwtUtil.generateToken(request.getUsername());
+        log.debug("🎫 [AUTH] Token generated (last 10 chars): ...{}", 
+                 token.substring(Math.max(0, token.length() - 10)));
         
         AuthResponse response = AuthResponse.builder()
                 .token(token)
@@ -92,7 +112,9 @@ public class AuthController {
                 .expiresIn(jwtUtil.getExpiration())
                 .build();
         
-        log.info("Login successful for user: {}", request.getUsername());
+        log.info("✅ [AUTH] Login successful for user: {}", request.getUsername());
+        log.debug("📤 [AUTH] Sending response with token and username");
+        
         return Mono.just(ResponseEntity.ok(response));
     }
     
