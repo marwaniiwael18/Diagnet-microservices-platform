@@ -27,6 +27,10 @@ export default function Login() {
       localStorage.setItem('username', response.username);
       console.log('💾 [Login] Token saved to localStorage');
       
+      // Trigger auth change event
+      window.dispatchEvent(new Event('authChange'));
+      console.log('🔄 [Login] Auth change event dispatched');
+      
       navigate('/dashboard');
     } catch (err) {
       console.error('❌ [Login] Login failed:', err);

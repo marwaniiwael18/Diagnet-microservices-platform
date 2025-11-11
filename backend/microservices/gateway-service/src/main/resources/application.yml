@@ -8,6 +8,21 @@ spring:
   # Cloud Gateway Configuration
   cloud:
     gateway:
+      # Global CORS Configuration (IMPORTANT for React frontend!)
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins: "http://localhost:5173"
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowed-headers: "*"
+            allow-credentials: true
+            max-age: 3600
+            
       # Route definitions
       routes:
         # Collector Service Routes
@@ -25,21 +40,6 @@ spring:
             - Path=/api/analysis/**
           filters:
             - RewritePath=/api/analysis/(?<segment>.*), /api/analysis/${segment}
-            
-      # Global CORS Configuration
-      globalcors:
-        corsConfigurations:
-          '[/**]':
-            allowedOrigins: "*"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-            allowedHeaders: "*"
-            exposedHeaders:
-              - Authorization
 
 # Server Configuration
 server:
