@@ -8,6 +8,13 @@ spring:
   # Cloud Gateway Configuration
   cloud:
     gateway:
+      # Global default filters - applied to all routes
+      default-filters:
+        # Remove duplicate CORS headers from downstream services
+        # RETAIN_FIRST keeps the Gateway's CORS headers (from CorsWebFilter)
+        # and drops any CORS headers from downstream services
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+      
       # Route definitions
       routes:
         # Collector Service Routes

@@ -7,9 +7,9 @@ spring:
     
   # Database Configuration (shared with collector-service)
   datasource:
-    url: jdbc:postgresql://localhost:5432/diagnostic
-    username: admin
-    password: admin
+    url: jdbc:postgresql://localhost:5432/diagnet_db
+    username: diagnet_user
+    password: diagnet_password
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10

@@ -35,7 +35,7 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
-                // Disable CORS here - we'll handle it in application.yml for Gateway
+                // Disable CORS here - we'll handle it with CorsWebFilter
                 .cors(cors -> cors.disable())
                 
                 // Disable CSRF (not needed for stateless JWT API)
@@ -43,6 +43,9 @@ public class SecurityConfig {
                 
                 // Configure authorization rules
                 .authorizeExchange(exchanges -> exchanges
+                        // Allow all OPTIONS requests (for CORS preflight)
+                        .pathMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                        
                         // Public endpoints (no auth needed)
                         .pathMatchers("/auth/**").permitAll()
                         .pathMatchers("/actuator/health").permitAll()
