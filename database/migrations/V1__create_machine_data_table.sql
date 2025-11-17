@@ -2,6 +2,9 @@
 -- Purpose: Store time-series sensor data from industrial machines
 -- Date: 2025-11-11
 
+-- Enable TimescaleDB extension
+CREATE EXTENSION IF NOT EXISTS timescaledb;
+
 -- Create the main machine_data table
 CREATE TABLE IF NOT EXISTS machine_data (
     id BIGSERIAL,
