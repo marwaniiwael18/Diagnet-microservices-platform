@@ -31,7 +31,8 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
-package-lock.json
+# Keep package-lock.json for reproducible builds in CI/CD
+# package-lock.json
 yarn.lock
 
 # React

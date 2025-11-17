@@ -12,8 +12,6 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
-      - "java"
-      - "gateway-service"
     commit-message:
       prefix: "chore"
       include: "scope"
@@ -26,8 +24,6 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
-      - "java"
-      - "collector-service"
     commit-message:
       prefix: "chore"
       include: "scope"
@@ -40,8 +36,6 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
-      - "java"
-      - "analyzer-service"
     commit-message:
       prefix: "chore"
       include: "scope"
@@ -55,8 +49,6 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
-      - "frontend"
-      - "react"
     commit-message:
       prefix: "chore"
       include: "scope"

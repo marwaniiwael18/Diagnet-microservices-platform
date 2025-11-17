@@ -81,12 +81,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: './frontend/react-dashboard/package-lock.json'
 
       - name: 📥 Install Dependencies
         working-directory: ./frontend/react-dashboard
-        run: npm ci
+        run: npm install
 
       - name: 🔍 Lint Code
         working-directory: ./frontend/react-dashboard
@@ -118,12 +116,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: './mqtt-simulator/package-lock.json'
 
       - name: 📥 Install Dependencies
         working-directory: ./mqtt-simulator
-        run: npm ci
+        run: npm install
 
       - name: ✅ Verify Simulator Script
         working-directory: ./mqtt-simulator
