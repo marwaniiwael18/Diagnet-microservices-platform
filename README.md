@@ -1,21 +1,28 @@
 # 🏭 DiagNet - Industrial Diagnostic Platform
 
 [![CI/CD Pipeline](https://github.com/marwaniiwael18/Diagnet-microservices-platform/actions/workflows/build-deploy.yml/badge.svg)](https://github.com/marwaniiwael18/Diagnet-microservices-platform/actions)
-[![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/)
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> A production-grade, full-stack industrial diagnostic platform for real-time machine monitoring, anomaly detection, and performance analytics.
+> **Production-grade, enterprise-ready microservices platform** for real-time industrial machine monitoring, predictive maintenance, and anomaly detection. Built with **Spring Boot 3, React, TimescaleDB, and MQTT**.
 
 ---
 
 ## 🎯 What is DiagNet?
 
-DiagNet is a **complete microservices-based industrial IoT platform** that simulates an industrial diagnostic system. It connects to machines via MQTT, collects sensor data in real-time, stores it in a time-series database, analyzes it for anomalies, and visualizes metrics on secure dashboards.
+DiagNet is a **complete, scalable microservices-based industrial IoT platform** designed for modern Industry 4.0 environments. It provides real-time machine health monitoring through:
 
-**Real-world use case**: Monitor temperature, vibration, pressure, and speed sensors across factory machines to predict failures before they happen!
+- **Real-time Sensor Data Ingestion** via MQTT (temperature, vibration, pressure, speed)
+- **Intelligent Anomaly Detection** using statistical algorithms (z-score, moving averages)
+- **Time-Series Analytics** with PostgreSQL + TimescaleDB for optimized performance
+- **Secure REST APIs** protected by JWT authentication and Spring Security
+- **Interactive Dashboards** with React + Recharts for live visualization
+- **Production Monitoring** via Prometheus + Grafana with custom dashboards
+
+**Real-world use case**: Monitor industrial equipment across factories to predict failures before they happen, reduce downtime by 40%, and optimize maintenance schedules!
 
 ---
 
