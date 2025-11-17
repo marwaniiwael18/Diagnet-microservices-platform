@@ -1,4 +1,11 @@
 # 🏭 DiagNet - Industrial Diagnostic Platform
+<img width="1440" height="900" alt="Screenshot 2025-11-17 at 22 47 24" src="https://github.com/user-attachments/assets/5f7d3af3-708e-43f8-8308-abd0d38bda37" />
+<img width="1440" height="900" alt="Screenshot 2025-11-17 at 21 12 22" src="https://github.com/user-attachments/assets/5a09bc00-1d21-4a4c-a5ff-5315743a05fa" />
+<img width="1440" height="900" alt="Screenshot 2025-11-17 at 21 08 29" src="https://github.com/user-attachments/assets/45223dcb-4087-49a9-a8cf-378a3124b701" />
+<img width="1440" height="900" alt="Screenshot 2025-11-12 at 22 52 45" src="https://github.com/user-attachments/assets/67c508fc-6db3-4e45-a94b-5adf1b2d37a4" />
+<img width="1281" height="728" alt="Screenshot 2025-11-12 at 22 50 16" src="https://github.com/user-attachments/assets/cd3ee323-a5fe-493d-ab23-a758a4df870d" />
+<img width="1281" height="731" alt="Screenshot 2025-11-12 at 22 50 06" src="https://github.com/user-attachments/assets/ba605f31-f7b0-4332-9f6f-9a9bb0edc341" />
+
 
 [![CI/CD Pipeline](https://github.com/marwaniiwael18/Diagnet-microservices-platform/actions/workflows/build-deploy.yml/badge.svg)](https://github.com/marwaniiwael18/Diagnet-microservices-platform/actions)
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
