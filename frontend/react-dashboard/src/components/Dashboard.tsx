@@ -14,6 +14,9 @@ export default function Dashboard() {
     queryKey: ['recentData'],
     queryFn: () => dataApi.getRecent(100),
     refetchInterval: 10000,
+    staleTime: 5000, // Don't refetch for 5 seconds after mount
+    retry: 1, // Only retry once on failure
+    retryDelay: 1000, // Wait 1 second before retry
   });
 
   // Group data by machine

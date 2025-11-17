@@ -23,15 +23,22 @@ export default function Login() {
       const response = await authApi.login({ username, password });
       console.log('✅ [Login] Login successful!', response);
       
+      // Save token and username
       localStorage.setItem('token', response.token);
       localStorage.setItem('username', response.username);
       console.log('💾 [Login] Token saved to localStorage');
+      console.log('🔑 [Login] Token value:', localStorage.getItem('token') ? 'EXISTS' : 'MISSING');
+      
+      // Small delay to ensure localStorage is written before navigation
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       // Trigger auth change event
       window.dispatchEvent(new Event('authChange'));
       console.log('🔄 [Login] Auth change event dispatched');
       
-      navigate('/dashboard');
+      // Navigate to dashboard
+      navigate('/dashboard', { replace: true });
+      console.log('🚀 [Login] Navigated to dashboard');
     } catch (err) {
       console.error('❌ [Login] Login failed:', err);
       console.error('📋 [Login] Error details:', {

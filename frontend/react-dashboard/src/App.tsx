@@ -4,7 +4,12 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Initialize from localStorage to avoid race condition
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    const token = localStorage.getItem('token');
+    console.log('🔍 [App] Initial auth check:', token ? 'Authenticated' : 'Not authenticated');
+    return token !== null;
+  });
 
   useEffect(() => {
     // Check authentication on mount and when storage changes
@@ -13,8 +18,6 @@ function App() {
       setIsAuthenticated(token !== null);
       console.log('🔍 [App] Auth check:', token ? 'Authenticated' : 'Not authenticated');
     };
-
-    checkAuth();
 
     // Listen for storage changes (when token is saved/removed)
     window.addEventListener('storage', checkAuth);

@@ -7,9 +7,9 @@ spring:
     
   # Database Configuration (shared with collector-service)
   datasource:
-    url: jdbc:postgresql://localhost:5432/diagnet_db
-    username: diagnet_user
-    password: diagnet_password
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/diagnet_db}
+    username: ${SPRING_DATASOURCE_USERNAME:diagnet_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:diagnet_password}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -31,7 +31,7 @@ server:
 # External Service URLs
 services:
   collector:
-    url: http://localhost:8081
+    url: ${COLLECTOR_SERVICE_URL:http://localhost:8081}
     
 # Analysis Configuration
 analysis:
@@ -60,10 +60,14 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,prometheus
   endpoint:
     health:
       show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      environment: development
       
 # Logging
 logging:

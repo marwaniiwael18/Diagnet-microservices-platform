@@ -91,11 +91,16 @@ services:
     ports:
       - "8082:8082"
     environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://timescaledb:5432/diagnet_db
+      SPRING_DATASOURCE_USERNAME: diagnet_user
+      SPRING_DATASOURCE_PASSWORD: diagnet_password
       COLLECTOR_SERVICE_URL: http://collector-service:8081
       JAVA_OPTS: "-Xmx512m -Xms256m"
     depends_on:
-      collector-service:
+      timescaledb:
         condition: service_healthy
+      collector-service:
+        condition: service_started
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8082/actuator/health || exit 1"]
       interval: 30s
@@ -175,6 +180,51 @@ services:
       - diagnet-network
 
   # ============================================
+  # PROMETHEUS - Metrics Collection
+  # ============================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: diagnet-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - diagnet-network
+
+  # ============================================
+  # GRAFANA - Metrics Visualization
+  # ============================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: diagnet-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+      GF_SERVER_ROOT_URL: http://localhost:3000
+      GF_INSTALL_PLUGINS: ''
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning
+      - ./observability/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    depends_on:
+      - prometheus
+    networks:
+      - diagnet-network
+
+  # ============================================
   # REACT DASHBOARD - Frontend UI
   # ============================================
   # react-dashboard:
@@ -203,6 +253,10 @@ volumes:
   mosquitto-logs:
     driver: local
   pgadmin-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
     driver: local
 
 # ============================================

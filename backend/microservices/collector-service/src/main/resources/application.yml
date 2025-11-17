@@ -7,9 +7,9 @@ spring:
     
   # Database Configuration (PostgreSQL/TimescaleDB)
   datasource:
-    url: jdbc:postgresql://localhost:5432/diagnet_db
-    username: diagnet_user
-    password: diagnet_password
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/diagnet_db}
+    username: ${SPRING_DATASOURCE_USERNAME:diagnet_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:diagnet_password}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -34,7 +34,7 @@ server:
         
 # MQTT Configuration
 mqtt:
-  broker-url: tcp://localhost:1883
+  broker-url: ${MQTT_BROKER_URL:tcp://localhost:1883}
   client-id: collector-service-${random.uuid}
   username: admin
   password: admin
@@ -51,10 +51,14 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,prometheus
   endpoint:
     health:
       show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      environment: development
       
 # Logging
 logging:

@@ -19,7 +19,7 @@ spring:
       routes:
         # Collector Service Routes
         - id: collector-service
-          uri: http://localhost:8081
+          uri: ${COLLECTOR_SERVICE_URL:http://localhost:8081}
           predicates:
             - Path=/api/data/**
           filters:
@@ -27,7 +27,7 @@ spring:
             
         # Analyzer Service Routes
         - id: analyzer-service
-          uri: http://localhost:8082
+          uri: ${ANALYZER_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/api/analysis/**
           filters:
@@ -44,15 +44,20 @@ jwt:
   secret: ${JWT_SECRET:DiagNetSuperSecretKeyForJWTTokenGeneration2025MustBeLongEnough!!!ThisIsA512BitSecretKeyForHS512Algorithm@@@@####}
   expiration: 86400000  # 24 hours in milliseconds
 
-# Actuator
+# Actuator - Health Checks & Metrics
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,gateway
+        # Expose health, info, gateway routes, and Prometheus metrics
+        include: health,info,gateway,prometheus,metrics
   endpoint:
     health:
       show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      environment: development
       
 # Logging
 logging:

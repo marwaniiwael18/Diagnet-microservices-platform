@@ -26,7 +26,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle 401 errors (redirect to login)
+// Handle errors
 api.interceptors.response.use(
   (response) => {
     console.log('✅ [API Response]', response.status, response.config.url);
@@ -40,10 +40,18 @@ api.interceptors.response.use(
       data: error.response?.data
     });
     
-    if (error.response?.status === 401) {
-      console.warn('🚫 [API] Unauthorized - redirecting to login');
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+    // Only auto-logout on 401 if we're NOT on the login page
+    // This prevents race conditions during login
+    if (error.response?.status === 401 && !error.config?.url?.includes('/auth/login')) {
+      console.warn('🚫 [API] Unauthorized - clearing token');
+      // Only clear token if we're making an authenticated request
+      // Don't redirect immediately - let React Router handle it
+      const token = localStorage.getItem('token');
+      if (token) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        window.dispatchEvent(new Event('authChange'));
+      }
     }
     return Promise.reject(error);
   }

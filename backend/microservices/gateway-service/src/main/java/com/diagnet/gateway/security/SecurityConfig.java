@@ -9,6 +9,7 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Arrays;
 
@@ -35,21 +36,26 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
-                // Disable CORS here - we'll handle it with CorsWebFilter
-                .cors(cors -> cors.disable())
+                // ENABLE CORS - use the CorsWebFilter from CorsConfig
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:3000"));
+                    config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
+                    config.setAllowedHeaders(Arrays.asList("*"));
+                    config.setExposedHeaders(Arrays.asList("Authorization"));
+                    config.setAllowCredentials(true);
+                    config.setMaxAge(3600L);
+                    return config;
+                }))
                 
                 // Disable CSRF (not needed for stateless JWT API)
                 .csrf(csrf -> csrf.disable())
                 
                 // Configure authorization rules
                 .authorizeExchange(exchanges -> exchanges
-                        // Allow all OPTIONS requests (for CORS preflight)
-                        .pathMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
-                        
                         // Public endpoints (no auth needed)
                         .pathMatchers("/auth/**").permitAll()
-                        .pathMatchers("/actuator/health").permitAll()
-                        .pathMatchers("/actuator/info").permitAll()
+                        .pathMatchers("/actuator/**").permitAll()  // All actuator endpoints
                         
                         // All other endpoints require authentication
                         .anyExchange().authenticated()

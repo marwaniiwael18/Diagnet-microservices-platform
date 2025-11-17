@@ -83,6 +83,12 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!-- Micrometer Prometheus Registry -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+
         <!-- Jackson: JSON processing -->
         <!-- Why: Already included in spring-boot-starter-web, used for MQTT message parsing -->
         <dependency>

@@ -1,0 +1,93 @@
+# Prometheus Configuration
+# Collects metrics from all Spring Boot services
+
+global:
+  scrape_interval: 15s      # How often to scrape targets
+  evaluation_interval: 15s  # How often to evaluate rules
+  
+  # Attach these labels to all metrics
+  external_labels:
+    monitor: 'diagnet-monitor'
+    environment: 'development'
+
+# Alerting configuration (optional - for future)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Load rules once and periodically evaluate them
+rule_files:
+  # - "alerts.yml"
+
+# Scrape configurations
+scrape_configs:
+  # ==================================================
+  # PROMETHEUS SELF-MONITORING
+  # ==================================================
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # ==================================================
+  # GATEWAY SERVICE - API Gateway Metrics
+  # ==================================================
+  - job_name: 'gateway-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['gateway-service:8080']
+        labels:
+          service: 'gateway'
+          layer: 'api-gateway'
+    # Only scrape if service is healthy
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+
+  # ==================================================
+  # COLLECTOR SERVICE - Data Ingestion Metrics
+  # ==================================================
+  - job_name: 'collector-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['collector-service:8081']
+        labels:
+          service: 'collector'
+          layer: 'data-ingestion'
+
+  # ==================================================
+  # ANALYZER SERVICE - Analysis Metrics
+  # ==================================================
+  - job_name: 'analyzer-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['analyzer-service:8082']
+        labels:
+          service: 'analyzer'
+          layer: 'data-processing'
+
+  # ==================================================
+  # TIMESCALEDB - Database Metrics (via postgres_exporter)
+  # ==================================================
+  # Commented out - requires postgres_exporter container
+  # - job_name: 'timescaledb'
+  #   static_configs:
+  #     - targets: ['postgres-exporter:9187']
+  #       labels:
+  #         service: 'timescaledb'
+  #         layer: 'database'
+
+  # ==================================================
+  # MQTT BROKER - Mosquitto Metrics
+  # ==================================================
+  # Commented out - requires mosquitto_exporter
+  # - job_name: 'mosquitto'
+  #   static_configs:
+  #     - targets: ['mosquitto-exporter:9234']
+  #       labels:
+  #         service: 'mosquitto'
+  #         layer: 'messaging'

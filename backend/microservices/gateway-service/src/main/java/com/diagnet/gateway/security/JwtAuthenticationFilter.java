@@ -3,7 +3,9 @@ package com.diagnet.gateway.security;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -93,7 +95,6 @@ public class JwtAuthenticationFilter implements WebFilter {
      */
     private boolean isPublicPath(String path) {
         return path.startsWith("/auth/") || 
-               path.equals("/actuator/health") ||
-               path.equals("/actuator/info");
+               path.startsWith("/actuator/");  // All actuator endpoints public
     }
 }

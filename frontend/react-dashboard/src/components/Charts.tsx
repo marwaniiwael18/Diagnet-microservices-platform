@@ -1,17 +1,20 @@
 import { useQuery } from '@tanstack/react-query';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { dataApi } from '../services/api';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, AlertCircle } from 'lucide-react';
 
 interface ChartsProps {
   machineId: string;
 }
 
 export default function Charts({ machineId }: ChartsProps) {
-  const { data: machineData, isLoading } = useQuery({
+  const { data: machineData, isLoading, error } = useQuery({
     queryKey: ['machineData', machineId],
     queryFn: () => dataApi.getRecentByMachine(machineId, 24),
     refetchInterval: 30000, // Refresh every 30 seconds
+    enabled: !!localStorage.getItem('token'), // Only run if token exists
+    retry: 2, // Retry failed requests twice
+    retryDelay: 1000, // Wait 1 second between retries
   });
 
   if (isLoading || !machineData) {
@@ -20,6 +23,21 @@ export default function Charts({ machineId }: ChartsProps) {
         <div className="flex items-center justify-center gap-3">
           <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-400"></div>
           <p className="text-gray-300">Loading analytics...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    console.error('[Charts] Error loading machine data:', error);
+    return (
+      <div className="backdrop-blur-xl bg-red-500/10 border border-red-400/20 rounded-2xl shadow-xl p-8">
+        <div className="flex items-center justify-center gap-3">
+          <AlertCircle className="w-8 h-8 text-red-400" />
+          <div>
+            <p className="text-red-300 font-semibold">Failed to load analytics</p>
+            <p className="text-red-400/70 text-sm">Unable to fetch data for {machineId}</p>
+          </div>
         </div>
       </div>
     );
