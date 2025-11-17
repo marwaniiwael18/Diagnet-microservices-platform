@@ -88,12 +88,12 @@ jobs:
           echo "analyzer_changed=$ANALYZER_CHANGED" >> $GITHUB_OUTPUT
           echo "frontend_changed=$FRONTEND_CHANGED" >> $GITHUB_OUTPUT
 
-      - name: ☕ Set up JDK 17
+      - name: ☕ Set up JDK 21
         if: steps.changes.outputs.gateway_changed == 'true' || steps.changes.outputs.collector_changed == 'true' || steps.changes.outputs.analyzer_changed == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
           cache: 'maven'
 
       - name: 🧪 Test Gateway Service
