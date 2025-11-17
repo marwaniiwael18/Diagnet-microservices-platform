@@ -1,0 +1,108 @@
+# Dependabot configuration for automatic dependency updates
+# This keeps your project secure and up-to-date
+
+version: 2
+updates:
+  # Maven dependencies (Backend Services)
+  - package-ecosystem: "maven"
+    directory: "/backend/microservices/gateway-service"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "java"
+      - "gateway-service"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+
+  - package-ecosystem: "maven"
+    directory: "/backend/microservices/collector-service"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "java"
+      - "collector-service"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+
+  - package-ecosystem: "maven"
+    directory: "/backend/microservices/analyzer-service"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "java"
+      - "analyzer-service"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+
+  # NPM dependencies (Frontend)
+  - package-ecosystem: "npm"
+    directory: "/frontend/react-dashboard"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "frontend"
+      - "react"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    ignore:
+      # Ignore major version updates for stability
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # NPM dependencies (MQTT Simulator)
+  - package-ecosystem: "npm"
+    directory: "/mqtt-simulator"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "mqtt-simulator"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+
+  # Docker dependencies
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore"
+      include: "scope"

@@ -1,0 +1,131 @@
+name: Pull Request Checks
+
+# Runs on all pull requests to ensure quality before merging
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  pr-validation:
+    name: PR Quality Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for better analysis
+
+      - name: 🔍 Check for Large Files
+        run: |
+          echo "Checking for files larger than 10MB..."
+          find . -type f -size +10M | grep -v "node_modules\|target\|.git" || echo "✅ No large files found"
+
+      - name: 🔍 Check for Secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.pull_request.base.sha }}
+          head: ${{ github.event.pull_request.head.sha }}
+
+      - name: 📝 PR Title Validation
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          if [[ ! "$PR_TITLE" =~ ^(feat|fix|docs|style|refactor|test|chore|perf): ]]; then
+            echo "❌ PR title must start with: feat:, fix:, docs:, style:, refactor:, test:, chore:, or perf:"
+            echo "Current title: $PR_TITLE"
+            exit 1
+          fi
+          echo "✅ PR title format is valid"
+
+      - name: 📊 Changed Files Summary
+        run: |
+          echo "Files changed in this PR:"
+          git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
+
+  # ============================================
+  # Run tests on changed services only
+  # ============================================
+  smart-tests:
+    name: Smart Testing (Changed Services)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔍 Detect Changed Services
+        id: changes
+        run: |
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
+          
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          
+          # Check which services changed
+          GATEWAY_CHANGED="false"
+          COLLECTOR_CHANGED="false"
+          ANALYZER_CHANGED="false"
+          FRONTEND_CHANGED="false"
+          
+          if echo "$CHANGED_FILES" | grep -q "backend/microservices/gateway-service"; then
+            GATEWAY_CHANGED="true"
+          fi
+          if echo "$CHANGED_FILES" | grep -q "backend/microservices/collector-service"; then
+            COLLECTOR_CHANGED="true"
+          fi
+          if echo "$CHANGED_FILES" | grep -q "backend/microservices/analyzer-service"; then
+            ANALYZER_CHANGED="true"
+          fi
+          if echo "$CHANGED_FILES" | grep -q "frontend/react-dashboard"; then
+            FRONTEND_CHANGED="true"
+          fi
+          
+          echo "gateway_changed=$GATEWAY_CHANGED" >> $GITHUB_OUTPUT
+          echo "collector_changed=$COLLECTOR_CHANGED" >> $GITHUB_OUTPUT
+          echo "analyzer_changed=$ANALYZER_CHANGED" >> $GITHUB_OUTPUT
+          echo "frontend_changed=$FRONTEND_CHANGED" >> $GITHUB_OUTPUT
+
+      - name: ☕ Set up JDK 17
+        if: steps.changes.outputs.gateway_changed == 'true' || steps.changes.outputs.collector_changed == 'true' || steps.changes.outputs.analyzer_changed == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: 🧪 Test Gateway Service
+        if: steps.changes.outputs.gateway_changed == 'true'
+        working-directory: ./backend/microservices/gateway-service
+        run: mvn test -B
+
+      - name: 🧪 Test Collector Service
+        if: steps.changes.outputs.collector_changed == 'true'
+        working-directory: ./backend/microservices/collector-service
+        run: mvn test -B
+
+      - name: 🧪 Test Analyzer Service
+        if: steps.changes.outputs.analyzer_changed == 'true'
+        working-directory: ./backend/microservices/analyzer-service
+        run: mvn test -B
+
+      - name: 📦 Setup Node.js
+        if: steps.changes.outputs.frontend_changed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './frontend/react-dashboard/package-lock.json'
+
+      - name: 🧪 Test Frontend
+        if: steps.changes.outputs.frontend_changed == 'true'
+        working-directory: ./frontend/react-dashboard
+        run: |
+          npm ci
+          npm run build
+
+      - name: ✅ Summary
+        run: |
+          echo "Smart testing completed for changed services only!"

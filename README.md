@@ -1,6 +1,7 @@
 # 🏭 DiagNet - Industrial Diagnostic Platform
 
-[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
+[![CI/CD Pipeline](https://github.com/marwaniiwael18/Diagnet-microservices-platform/actions/workflows/build-deploy.yml/badge.svg)](https://github.com/marwaniiwael18/Diagnet-microservices-platform/actions)
+[![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
