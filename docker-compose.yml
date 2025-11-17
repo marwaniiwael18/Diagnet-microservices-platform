@@ -11,15 +11,15 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: diagnet_db
-      POSTGRES_USER: diagnet_user
-      POSTGRES_PASSWORD: diagnet_password
+      POSTGRES_DB: ${POSTGRES_DB:-diagnet_db}
+      POSTGRES_USER: ${POSTGRES_USER:-diagnet_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-CHANGE_ME_IN_ENV_FILE}
       TIMESCALEDB_TELEMETRY: 'off'
     volumes:
       - timescaledb-data:/var/lib/postgresql/data
       - ./database/migrations:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U diagnet_user -d diagnet_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-diagnet_user} -d ${POSTGRES_DB:-diagnet_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -60,9 +60,9 @@ services:
     ports:
       - "8081:8081"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://timescaledb:5432/diagnet_db
-      SPRING_DATASOURCE_USERNAME: diagnet_user
-      SPRING_DATASOURCE_PASSWORD: diagnet_password
+      SPRING_DATASOURCE_URL: jdbc:postgresql://timescaledb:5432/${POSTGRES_DB:-diagnet_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-diagnet_user}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-CHANGE_ME_IN_ENV_FILE}
       MQTT_BROKER_URL: tcp://mosquitto:1883
       JAVA_OPTS: "-Xmx512m -Xms256m"
     depends_on:
@@ -91,9 +91,9 @@ services:
     ports:
       - "8082:8082"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://timescaledb:5432/diagnet_db
-      SPRING_DATASOURCE_USERNAME: diagnet_user
-      SPRING_DATASOURCE_PASSWORD: diagnet_password
+      SPRING_DATASOURCE_URL: jdbc:postgresql://timescaledb:5432/${POSTGRES_DB:-diagnet_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-diagnet_user}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-CHANGE_ME_IN_ENV_FILE}
       COLLECTOR_SERVICE_URL: http://collector-service:8081
       JAVA_OPTS: "-Xmx512m -Xms256m"
     depends_on:
@@ -124,7 +124,7 @@ services:
     environment:
       COLLECTOR_SERVICE_URL: http://collector-service:8081
       ANALYZER_SERVICE_URL: http://analyzer-service:8082
-      JWT_SECRET: your-256-bit-secret-key-for-jwt-token-generation-please-change-this-in-production
+      JWT_SECRET: ${JWT_SECRET:-CHANGE_ME_IN_ENV_FILE}
       JAVA_OPTS: "-Xmx512m -Xms256m"
     depends_on:
       collector-service:
@@ -210,8 +210,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin123
+      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD:-CHANGE_ME_IN_ENV_FILE}
       GF_USERS_ALLOW_SIGN_UP: 'false'
       GF_SERVER_ROOT_URL: http://localhost:3000
       GF_INSTALL_PLUGINS: ''
