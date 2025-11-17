@@ -29,7 +29,7 @@ export default function Dashboard() {
   }, {} as Record<string, MachineData[]>);
 
   // Get latest reading for each machine
-  const latestReadings = Object.entries(machineGroups || {}).map(([machineId, readings]) => {
+  const latestReadings = Object.entries(machineGroups || {}).map(([, readings]) => {
     const sorted = readings.sort((a, b) => 
       new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     );

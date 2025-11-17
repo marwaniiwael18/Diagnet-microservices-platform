@@ -8,6 +8,12 @@ on:
     branches: [ main ]
   workflow_dispatch:  # Allows manual triggering from GitHub UI
 
+# Permissions for security scanning and SARIF uploads
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
 # Environment variables available to all jobs
 env:
   REGISTRY: ghcr.io
