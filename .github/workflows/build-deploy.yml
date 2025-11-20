@@ -59,14 +59,14 @@ jobs:
 
       - name: 📊 Upload Test Results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-results-${{ matrix.service }}
           path: ./backend/microservices/${{ matrix.service }}/target/surefire-reports/
           retention-days: 7
 
       - name: 📤 Upload JAR Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: jar-${{ matrix.service }}
           path: ./backend/microservices/${{ matrix.service }}/target/*.jar
@@ -101,7 +101,7 @@ jobs:
         run: npm run build
 
       - name: 📤 Upload Build Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: frontend-dist
           path: ./frontend/react-dashboard/dist/
